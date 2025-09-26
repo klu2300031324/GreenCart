@@ -1,0 +1,46 @@
+services:
+  mysqldb:
+    container_name: mysql-db
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD: docker
+      MYSQL_DATABASE: grocery
+      # MYSQL_USER: klu
+      # MYSQL_PASSWORD: klu
+    ports:
+      - "3309:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - springboot-mysql-net
+
+  backend:
+    image: klu2300031324/grocery-backend:latest
+    container_name: springboot
+    ports:
+      - "2028:2026"
+    depends_on:
+      - mysqldb
+    restart: on-failure
+    networks:
+      - springboot-mysql-net
+
+  frontend:
+    image: klu2300031324/grocery-frontend:latest
+    container_name: react
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    restart: on-failure
+    networks:
+      - springboot-mysql-net
+
+# Declare volumes
+volumes:
+  mysql-data:
+
+# ✅ Declare networks here
+networks:
+  springboot-mysql-net:
+    driver: bridge
